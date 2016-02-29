@@ -5,7 +5,7 @@ namespace Ennead
     public class CardSlot
     {
         public ICard Card { get; set; }
-        public Player Owner { get; set; }
+        public IPlayer Owner { get; set; }
         public bool Skip { get; set; }
         public bool Scored { get; set; }
         public bool FaceUp { get; set; }

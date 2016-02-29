@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Ennead
 {
-    public class Player
+    public class Player : IPlayer
     {
         private BoardState gameState;
 
@@ -33,7 +33,7 @@ namespace Ennead
             }
         }
 
-        public List<ICard> HandOfCards { get; private set; }
+        public IList<ICard> HandOfCards { get; private set; }
         public int Number { get; private set;}
         
         public Player(int number, IRules rules, BoardState gameState)
@@ -52,7 +52,7 @@ namespace Ennead
 
             if (categories.Length == 0)
             {
-                // randomize
+                //TODO randomize
                 chosen = new List<ICard>() { HandOfCards[1], HandOfCards[7] };              
             }
             else
@@ -112,10 +112,7 @@ namespace Ennead
                 throw new Exception("Not enough gold.");
             }
 
-            gameState.Play(this, card, position);
-
-            Gold -= gameState.CostToPlay(position);
-            HandOfCards.Remove(card);
+            gameState.Play(this, card, position);            
         }
     }
 }

@@ -36,8 +36,11 @@ namespace Ennead
             return Queue.Count - (position - 1);
         }
 
-        public void Play(Player player, ICard card, int position)
-        {
+        public void Play(IPlayer player, ICard card, int position)
+        {          
+            player.Gold -= CostToPlay(position);
+            player.HandOfCards.Remove(card);
+
             Queue.Insert(position - 1, new CardSlot() { Card = card, Owner = player });
         }
     }

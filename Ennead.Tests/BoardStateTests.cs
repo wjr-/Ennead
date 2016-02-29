@@ -1,5 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Ennead.Interfaces;
+using NSubstitute;
 
 namespace Ennead.Tests
 {
@@ -7,6 +9,8 @@ namespace Ennead.Tests
     public class BoardStateTests
     {
         private BoardState state;
+        private IPlayer player;
+        private ICard card;
 
         [TestInitialize]
         public void Setup()
@@ -17,6 +21,10 @@ namespace Ennead.Tests
             state.Queue.Add(new CardSlot());
             state.Queue.Add(new CardSlot());
             state.Queue.Add(new CardSlot());
+
+            card = Substitute.For<ICard>();
+
+            player = Substitute.For<IPlayer>();
         }
 
         [TestMethod]
@@ -32,6 +40,30 @@ namespace Ennead.Tests
         public void ValidSlots()
         {
             Assert.AreEqual(5, state.ValidSlots.Length);
+        }
+
+        [TestMethod]
+        public void Play_InsertsCardInCorrectSlot()
+        {
+            state.Play(player, card, 2);
+
+            Assert.AreEqual(card, state.Queue[1].Card);
+        }
+
+        [TestMethod]
+        public void Play_DecreasesPlayerGold()
+        {
+            state.Play(player, card, 2);
+            
+            player.Received().Gold = -3;
+        }
+
+        [TestMethod]
+        public void Play_RemovesCardFromPlayerHand()
+        {
+            state.Play(player, card, 2);
+
+            player.HandOfCards.Received().Remove(card);
         }
     }
 }
