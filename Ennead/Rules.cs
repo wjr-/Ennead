@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Ennead.Interfaces;
 using Ennead.Cards;
 
@@ -11,7 +10,7 @@ namespace Ennead
         {
             get
             {
-                return 3;
+                return 4;
             }
         }
 
@@ -31,7 +30,15 @@ namespace Ennead
             }
         }
 
-        public List<ICard> GetStartingHandOfCards(Player player)
+        public int NumberOfPlayerTurns
+        {
+            get
+            {
+                return 3;
+            }
+        }
+
+        public List<ICard> GetStartingHandOfCards(IPlayer player)
         {
             return new List<ICard>()
             {

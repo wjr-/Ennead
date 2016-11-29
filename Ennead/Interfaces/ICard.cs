@@ -1,10 +1,5 @@
-﻿using Ennead.Cards;
-
-namespace Ennead.Interfaces
+﻿namespace Ennead.Interfaces
 {
-    public interface ICard
-    {
-        CardCategory Category { get;}
-        void Resolve(Game game);
-    }
+    public interface ICard : ICardBack, ICardFace
+    { }
 }

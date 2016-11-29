@@ -1,20 +1,24 @@
 ﻿using Ennead.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 
 namespace Ennead
 {
+    public delegate void GameEndedHandler(object sender, EventArgs args);
+
     public class Game
     {
         public BoardState State { get; private set; }
-        public IReadOnlyList<Player> Players { get; private set; }
+        public IReadOnlyList<IPlayer> Players { get; private set; }
         public IRules Rules { get; private set; }
 
-        public Game(IRules rules)
+        public event GameEndedHandler Ended;
+
+        public Game(IRules rules, params IPlayer[] players)
         {
             State = new BoardState();
-            Players = CreatePlayers(rules);
+            Players = players.ToList().AsReadOnly();
             Rules = rules;
         }
 
@@ -26,31 +30,37 @@ namespace Ennead
             {
                 Round(round);
             }
+
+            TallyScore();
         }
 
         private void Round0()
         {
-            var player1Cards = Players[0].SelectTwoCards();
-            State.PreviouslyPlayed.AddRange(player1Cards);
-
-            foreach (Player player in Players.Skip(1))
+            foreach (Player player in Players)
             {
-                var playerCards = player.SelectTwoCards(player1Cards[0].Category, player1Cards[1].Category);
+                var playerCards = new[] { player.ChooseCard(), player.ChooseCard(), player.ChooseCard() };
                 State.PreviouslyPlayed.AddRange(playerCards);
             }
         }
 
         private void Round(int roundNumber)
         {
-            foreach (int turns in Enumerable.Range(1, 2))
+            foreach (int turns in Enumerable.Range(1, Rules.NumberOfPlayerTurns))
             {
-                PlayerTurns();
-                
+                PlayerTurns();           
             }
 
             Scoring();
+
             //Take from previous
+            foreach (var player in Players)
+            {
+                player.GiveCards(State.PreviouslyPlayed.Where(c => c.Owner == player).ToArray());
+            }
+            State.PreviouslyPlayed.Clear();
+
             //Move to previous (refresh queue)
+            State.ClearQueueToPreviouslyPlayed();
 
             Players = MoveStartingPlayer();
         }
@@ -59,30 +69,42 @@ namespace Ennead
         {
             foreach (Player player in Players)
             {
-                player.Play();
+                player.Play(State);
             }
         }
 
         private void Scoring()
         {
-            foreach(int i in Enumerable.Range(0, State.Queue.Count))
+            while(State.UnscoredQueue.Any())
             {
-                State.Queue[i].Resolve(this);
+                State.UnscoredQueue.First().Resolve(this);
             }
         }
 
-        private IReadOnlyList<Player> CreatePlayers(IRules rules)
+        private IReadOnlyList<IPlayer> MoveStartingPlayer()
         {
-            return Enumerable.Range(1, rules.NumberOfPlayers)
-                .Select(i => new Player(i, rules, State))
+            return Players
+                .Skip(1)
+                .Concat(new [] { Players.First() })
                 .ToList()
-                .AsReadOnly();            
+                .AsReadOnly();
         }
 
-        private IReadOnlyList<Player> MoveStartingPlayer()
+        private void TallyScore()
         {
-            return Players.Skip(1).Concat(new List<Player>() { Players.First() }).ToList().AsReadOnly();
+            if(Ended != null)
+            {
+                Ended(this, new EventArgs());
+            }          
         }
 
+        public override string ToString()
+        {
+            string str = "";
+
+            str += Players.Select(p => p.ToString()).Aggregate((acc, p) => acc + p + " ");
+
+            return str;
+        }
     }
 }

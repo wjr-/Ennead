@@ -1,12 +1,11 @@
-﻿using System;
-using Ennead.Interfaces;
+﻿using Ennead.Interfaces;
 using System.Linq;
 
 namespace Ennead.Cards
 {
     public class Six : BaseCard
     {
-        public Six(Player owner)
+        public Six(IPlayer owner)
             : base(owner)
         {
 
@@ -19,7 +18,8 @@ namespace Ennead.Cards
                 return CardCategory.Second;
             }
         }
-        public override void Resolve(Game game)
+        public
+            override void Resolve(Game game)
         {
             if (NextCards(game).Any())
             {

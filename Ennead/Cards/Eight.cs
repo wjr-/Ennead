@@ -1,12 +1,11 @@
-﻿using System;
-using Ennead.Interfaces;
+﻿using Ennead.Interfaces;
 using System.Linq;
 
 namespace Ennead.Cards
 {
     public class Eight : BaseCard
     {
-        public Eight(Player owner)
+        public Eight(IPlayer owner)
             : base(owner)
         {
 
@@ -24,7 +23,7 @@ namespace Ennead.Cards
         {
             if (NextCards(game).Any())
             {
-                NextCard(game).Owner = Owner;
+                NextCard(game).SetOwner(Owner);
             }
         }
     }

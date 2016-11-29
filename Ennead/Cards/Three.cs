@@ -1,10 +1,11 @@
-﻿using System.Linq;
+﻿using Ennead.Interfaces;
+using System.Linq;
 
 namespace Ennead.Cards
 {
     public class Three : BaseCard
     {
-        public Three(Player owner)
+        public Three(IPlayer owner)
             : base(owner)
         {
 
